@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import TaskTable, { type Task } from "./_components/taskTable";
 import { fetcher } from "@/lib/fetcher";
 import { API } from "@/lib/api";
-import { Skeleton } from "@/components/ui/skeleton";
 import { env } from "@/utils/env";
 import useSWR from "swr";
 import {
@@ -14,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import TaskSkeleton from "./_components/taskSkeleton";
 
 export default function TasksPage() {
   const url = env.NEXT_PUBLIC_API_URL + API.getTasks;
@@ -26,17 +26,16 @@ export default function TasksPage() {
     },
   });
 
-  const tasks = data?.data ?? [];
+  // Normalize server status (e.g. "PENDING"/"COMPLETED") to lowercase used by UI
+  const tasks: Task[] = (data?.data ?? []).map((t: any) => ({
+    ...t,
+    status: (t.status ?? "PENDING").toString().toLowerCase(),
+  }));
 
   if (isLoading) {
     // Skeleton placeholder for table while loading
     return (
-      <div className="space-y-2 p-4">
-        <Skeleton className="h-8 w-1/3" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-full" />
-      </div>
+      <TaskSkeleton />
     );
   }
 

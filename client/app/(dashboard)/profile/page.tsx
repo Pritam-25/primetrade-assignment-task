@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { User } from "lucide-react";
 
-import UpdateProfileDialog, { Profile } from "./UpdateProfileDialog";
+import UpdateProfileDialog, { Profile } from "./_components/UpdateProfileDialog";
 import { fetcher, request } from "@/lib/fetcher";
 import { API } from "@/lib/api";
 import { env } from "@/utils/env";

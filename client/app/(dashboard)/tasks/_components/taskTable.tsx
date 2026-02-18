@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -227,14 +227,12 @@ export default function TaskTable({ tasks }: TaskTableProps) {
           <TableHeader className="bg-accent">
             <TableRow>
               <TableHead className="text-center w-[50px]">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4"
+                <Checkbox
                   checked={
                     filteredTasks.length > 0 &&
                     filteredTasks.every((t) => selectedIds.has(t.id))
                   }
-                  onChange={handleSelectAll}
+                  onCheckedChange={() => handleSelectAll()}
                 />
               </TableHead>
               <TableHead>Title</TableHead>
@@ -258,29 +256,26 @@ export default function TaskTable({ tasks }: TaskTableProps) {
               filteredTasks.map((task) => (
                 <TableRow key={task.id}>
                   <TableCell className="text-center">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       className="h-4 w-4"
                       checked={selectedIds.has(task.id)}
-                      onChange={() => handleCheckboxChange(task.id)}
+                      onCheckedChange={() => handleCheckboxChange(task.id)}
                     />
                   </TableCell>
                   <TableCell>{task.title}</TableCell>
                   <TableCell>{task.description ?? "-"}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        task.status === "completed" ? "default" : "secondary"
-                      }
+                    <div
                       className={cn(
+                        "inline-flex items-center justify-center rounded-full border-1 px-2 py-1 text-xs font-medium w-fit whitespace-nowrap shrink-0",
                         task.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800",
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/40  dark:text-green-400"
+                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400",
                       )}
                     >
                       {task.status.charAt(0).toUpperCase() +
                         task.status.slice(1)}
-                    </Badge>
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">

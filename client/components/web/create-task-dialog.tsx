@@ -23,9 +23,20 @@ import { Field, FieldLabel, FieldError, FieldSet } from "@/components/ui/field";
 
 import { request } from "@/lib/fetcher";
 import { API } from "@/lib/api";
-import { createOrUpdateTaskSchema } from "@/lib/schemas";
-import type { CreateTaskInput } from "@/lib/schemas";
+import { env } from "@/utils/env";
+import { mutate } from "swr";
+import { createTaskSchema, updateTaskSchema } from "@/lib/schemas";
+import type { CreateTaskInput, UpdateTaskInput } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Controller } from "react-hook-form";
+import { Task } from "@/app/(dashboard)/tasks/_components/taskTable";
 
 type CreateTaskDialogProps = {
   // pass `undefined` to render the default Add button, pass a React node to use a custom trigger,
@@ -59,8 +70,10 @@ export function CreateTaskDialog({
 
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<CreateTaskInput>({
-    resolver: zodResolver(createOrUpdateTaskSchema),
+  const form = useForm<any>({
+    resolver: zodResolver(
+      mode === "create" ? createTaskSchema : updateTaskSchema,
+    ),
     defaultValues: { title: "", description: "", status: "PENDING" },
   });
 
@@ -72,16 +85,19 @@ export function CreateTaskDialog({
         description: initialValues.description ?? "",
         status: initialValues.status ?? "PENDING",
       });
+    } else if (mode === "create") {
+      form.reset({ title: "", description: "" });
     }
   }, [initialValues]);
 
-  const onSubmit = (values: CreateTaskInput) => {
+  const onSubmit = (values: CreateTaskInput | UpdateTaskInput) => {
     startTransition(async () => {
       if (mode === "create") {
-        const res = await request<{ task: any }>(
+        const res = await request<{ task: Task }>(
           API.createTask,
           "POST",
-          { data: values },
+          // ensure create does not send status (backend will default to PENDING)
+          { data: { title: values.title, description: values.description } },
           "Failed to create task",
         );
 
@@ -92,13 +108,15 @@ export function CreateTaskDialog({
 
         toast.success(res.message || "Task created");
         setOpen(false);
-        router.replace("/tasks");
+        // refresh to revalidate Next data and also revalidate SWR cache
+        router.refresh();
+        mutate(env.NEXT_PUBLIC_API_URL + API.getTasks);
         return;
       }
 
       // edit mode
       if (mode === "edit" && initialValues?.id) {
-        const res = await request<{ task: any }>(
+        const res = await request<{ task: Task }>(
           "updateTask",
           "PUT",
           { data: values, params: { id: initialValues.id } },
@@ -112,7 +130,9 @@ export function CreateTaskDialog({
 
         toast.success(res.message || "Task updated");
         setOpen(false);
-        router.replace("/tasks");
+        // refresh to revalidate Next data and also revalidate SWR cache
+        router.refresh();
+        mutate(env.NEXT_PUBLIC_API_URL + API.getTasks);
         return;
       }
     });
@@ -133,9 +153,13 @@ export function CreateTaskDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Task</DialogTitle>
+          <DialogTitle>
+            {mode === "create" ? "Create Task" : "Update Task"}
+          </DialogTitle>
           <DialogDescription>
-            Create a new task — provide a title and optional description.
+            {mode === "create"
+              ? "Create a new task — provide a title and optional description."
+              : "Update the task — you can change title, description and status."}
           </DialogDescription>
         </DialogHeader>
 
@@ -177,6 +201,38 @@ export function CreateTaskDialog({
                 </FieldError>
               )}
             </Field>
+            {mode === "edit" && (
+              <Field>
+                <FieldLabel>Status</FieldLabel>
+
+                <Controller
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isPending}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="COMPLETED">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+
+                {form.formState.errors.status && (
+                  <FieldError>
+                    {form.formState.errors.status.message as string}
+                  </FieldError>
+                )}
+              </Field>
+            )}
           </FieldSet>
         </form>
 
