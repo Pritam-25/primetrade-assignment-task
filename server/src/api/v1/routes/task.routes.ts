@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { requireAuth } from '@middleware/auth.middleware.js';
 import {
   createTask,
   getUserTasks,

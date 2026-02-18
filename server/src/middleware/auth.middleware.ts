@@ -12,12 +12,9 @@ export const requireAuth = async (
   next: NextFunction
 ) => {
   try {
-    console.log('Checking authentication for request to:', req.path);
     const token = req.cookies.jwt;
-    console.log('Extracted token from cookies:', token);
 
     if (!token) {
-      console.log('No token found in cookies');
       throw new ApiError(
         statusCode.unauthorized,
         ERROR_CODES.NOT_AUTHENTICATED

@@ -1,4 +1,3 @@
-import { UpdateUserProfileInput } from '@schemas/user.schema.js';
 import { getProfileService, updateProfileService } from '@services/index.js';
 import { successResponse } from '@utils/apiResponse.js';
 import { statusCode } from '@utils/statusCodes.js';

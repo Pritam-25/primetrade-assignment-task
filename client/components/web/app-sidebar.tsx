@@ -2,25 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  type LucideIcon,
-  LayoutDashboard,
-  CreditCard,
-  Brain,
-} from "lucide-react";
+import { type LucideIcon, List, User, Brain } from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import CreateTaskDialog from "@/components/web/create-task-dialog";
 
 type NavItem = {
@@ -33,12 +25,12 @@ const items: NavItem[] = [
   {
     title: "Tasks",
     url: "/tasks",
-    icon: LayoutDashboard,
+    icon: List,
   },
   {
     title: "Profile",
     url: "/profile",
-    icon: CreditCard,
+    icon: User,
   },
 ];
 

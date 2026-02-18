@@ -100,6 +100,7 @@ export default defineConfig([
             },
             { from: 'schemas', allow: ['schemas', 'utils'] },
             { from: 'config', allow: ['utils'] },
+            { from: 'utils', allow: ['utils'] },
           ],
         },
       ],

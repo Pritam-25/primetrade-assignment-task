@@ -27,9 +27,36 @@ import { createOrUpdateTaskSchema } from "@/lib/schemas";
 import type { CreateTaskInput } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 
-export function CreateTaskDialog() {
+type CreateTaskDialogProps = {
+  // pass `undefined` to render the default Add button, pass a React node to use a custom trigger,
+  // or pass `null` to render no trigger at all (useful when controlling open externally).
+  trigger?: React.ReactNode | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  initialValues?: {
+    id?: string;
+    title?: string;
+    description?: string;
+    status?: "PENDING" | "COMPLETED";
+  };
+  mode?: "create" | "edit";
+};
+
+export function CreateTaskDialog({
+  trigger,
+  open: openProp,
+  onOpenChange,
+  initialValues,
+  mode = "create",
+}: CreateTaskDialogProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = typeof openProp === "boolean" ? openProp : openState;
+  const setOpen = (v: boolean) => {
+    if (onOpenChange) onOpenChange(v);
+    if (typeof openProp !== "boolean") setOpenState(v);
+  };
+
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<CreateTaskInput>({
@@ -37,34 +64,72 @@ export function CreateTaskDialog() {
     defaultValues: { title: "", description: "", status: "PENDING" },
   });
 
+  // reset form when initialValues change (for edit)
+  React.useEffect(() => {
+    if (initialValues) {
+      form.reset({
+        title: initialValues.title ?? "",
+        description: initialValues.description ?? "",
+        status: initialValues.status ?? "PENDING",
+      });
+    }
+  }, [initialValues]);
+
   const onSubmit = (values: CreateTaskInput) => {
     startTransition(async () => {
-      const res = await request<{ task: any }>(
-        API.createTask,
-        "POST",
-        { data: values },
-        "Failed to create task",
-      );
+      if (mode === "create") {
+        const res = await request<{ task: any }>(
+          API.createTask,
+          "POST",
+          { data: values },
+          "Failed to create task",
+        );
 
-      if (!res.success) {
-        toast.error(res.errMsg);
+        if (!res.success) {
+          toast.error(res.errMsg);
+          return;
+        }
+
+        toast.success(res.message || "Task created");
+        setOpen(false);
+        router.replace("/tasks");
         return;
       }
 
-      toast.success(res.message || "Task created");
-      setOpen(false);
-      router.replace("/tasks");
+      // edit mode
+      if (mode === "edit" && initialValues?.id) {
+        const res = await request<{ task: any }>(
+          "updateTask",
+          "PUT",
+          { data: values, params: { id: initialValues.id } },
+          "Failed to update task",
+        );
+
+        if (!res.success) {
+          toast.error(res.errMsg);
+          return;
+        }
+
+        toast.success(res.message || "Task updated");
+        setOpen(false);
+        router.replace("/tasks");
+        return;
+      }
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full justify-start gap-2" size="sm">
-          <Plus className="h-4 w-4" />
-          <span>Add task</span>
-        </Button>
-      </DialogTrigger>
+      {trigger === undefined ? (
+        <DialogTrigger asChild>
+          <Button className="w-full justify-start gap-2" size="sm">
+            <Plus className="h-4 w-4" />
+            <span>Add task</span>
+          </Button>
+        </DialogTrigger>
+      ) : trigger !== null ? (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      ) : null}
 
       <DialogContent>
         <DialogHeader>
@@ -124,10 +189,12 @@ export function CreateTaskDialog() {
             {isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Creating...
+                {mode === "create" ? "Creating..." : "Updating..."}
               </span>
-            ) : (
+            ) : mode === "create" ? (
               "Create"
+            ) : (
+              "Update"
             )}
           </Button>
         </DialogFooter>
