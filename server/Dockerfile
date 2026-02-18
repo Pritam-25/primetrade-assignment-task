@@ -19,8 +19,8 @@ COPY . .
 # Build TypeScript
 RUN pnpm build
 
-# Remove dev dependencies
-RUN pnpm prune --prod
+# Remove dev dependencies (skip lifecycle scripts so postinstall doesn't run)
+RUN pnpm prune --prod --ignore-scripts
 
 
 # -----------------------------
@@ -39,5 +39,5 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node -r tsconfig-paths/register dist/index.js"]
+CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
 

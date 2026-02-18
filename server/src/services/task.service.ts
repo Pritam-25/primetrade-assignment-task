@@ -65,10 +65,9 @@ export const updateTaskService = async (
   });
 };
 
-
 export const deleteTasksService = async (
   userId: string,
-  taskIds: string | string[],
+  taskIds: string | string[]
 ) => {
   const idsArr = Array.isArray(taskIds) ? taskIds : [taskIds];
 
@@ -85,7 +84,7 @@ export const deleteTasksService = async (
     throw new ApiError(statusCode.notFound, ERROR_CODES.TASK_NOT_FOUND);
   }
 
-  const idsToDelete = ownedTasks.map((t) => t.id);
+  const idsToDelete = ownedTasks.map(t => t.id);
 
   const result = await prisma.task.deleteMany({
     where: { id: { in: idsToDelete } },

@@ -1,31 +1,132 @@
-# PrimeTrade - Frontend + Backend
+# PrimeTrade Task Management App
 
-Professional README: how to run, architecture, data flow, and developer guide.
+This repository contains a full-stack task management application developed as part of a Frontend Developer technical assessment.
+
+---
+
+## 🌐 Live Demo
+
+- Frontend: https://your-frontend.onrender.com
+- Backend API: https://your-backend.onrender.com/api/v1
+
+---
+
+## 🛠 Tech Stack
+
+**Frontend:**
+
+- Next.js 14 (App Router)
+- React + TypeScript
+- TailwindCSS
+- shadcn/ui
+- Protected routes
+- react-hook-form
+- Zod
+
+**Backend:**
+
+- Node.js + Express
+- TypeScript
+- Prisma ORM
+- PostgreSQL (Neon)
+- JWT Authentication
+- bcrypt password hashing
+- Zod
+
+**DevOps:**
+
+- Docker + Docker Compose
+- Render deployment
+
+---
+
+## 🛠️ Request/Data Flow
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant API as API (HTTP)
+    participant AUTH as Auth Middleware
+    participant ROUTE as Route Handler
+    participant VAL as Validation Middleware
+    participant CTRL as Controller
+    participant SVC as Service
+    participant REP as Repository (Prisma)
+    participant DB as Database
+    participant ERR as Error Handler
+
+    FE->>API: Client-side validation → send request
+    API->>AUTH: Verify JWT / auth headers
+    AUTH-->>API: Auth OK / 401
+    AUTH->>ROUTE: Forward to route handler
+    ROUTE->>VAL: Validate request schema
+    VAL-->>ROUTE: Valid / 400
+    ROUTE->>CTRL: Call controller
+    CTRL->>SVC: Execute business logic
+    SVC->>REP: Repository (Prisma) operations
+    REP->>DB: Query / update
+    DB-->>REP: Result
+    REP-->>SVC: Return data
+    SVC-->>CTRL: Service result
+    CTRL-->>API: Response payload
+    API-->>FE: Send response
+
+    %% Error paths
+    AUTH->>ERR: Unauthorized error
+    VAL->>ERR: Validation error
+    CTRL->>ERR: Runtime / DB error
+    ERR-->>API: Formatted error
+    API-->>FE: Error response
+```
+
+**Flow Explanation:**
+
+- The frontend first validates user input.
+- The backend request passes through authentication middleware.
+- The route handler matches the endpoint.
+- Validation middleware checks the request schema.
+- The controller handles business logic and delegates to services.
+- Services interact with repositories for database operations.
+- Errors at any stage are caught by a centralized error handler and returned to the frontend.
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Architecture](#architecture)
+- [Core Features](#core-features)
+- [Data Flow](#data-flow)
+- [Getting Started](#getting-started)
+  - [Docker Compose](#docker-compose)
+  - [Local Development](#local-development)
+- [Environment Variables](#environment-variables)
+- [API Overview](#api-overview)
+- [Database & Prisma](#database--prisma)
+- [Development Notes](#development-notes)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [Security Practices](#-security-practices)
+- [Production Scaling Strategy](#-production-scaling-strategy)
 
 ---
 
 ## Project Overview
 
-This repository contains a simple task management app split into two main parts:
+This repository contains a full-stack task management application developed as part of a Frontend Developer technical assessment. The project is split into:
 
-- `client/` — Next.js (App Router) frontend written in TypeScript and React. Uses `sonner` for toasts and a component library under `client/components/ui`.
-- `server/` — Express + TypeScript backend with Prisma for database access. Exposes a REST API under `/api/v1` (routes defined in `server/src/api/v1`).
+- `client/` — Next.js 14 (App Router), TypeScript, React, UI components, and toast notifications.
+- `server/` — Express.js, TypeScript, Prisma ORM, JWT authentication, REST API.
 
-The project is prepared to run with Docker Compose (development-friendly configuration provided at `docker-compose.yaml`).
+**Key Objectives:**
+
+- Build a modern, responsive, and accessible task management UI.
+- Integrate with a secure backend API for authentication, user profile, and task CRUD operations.
+- Demonstrate clean code, component design, state management, and API integration.
 
 ---
 
-## Architecture (High level)
-
-- Browser / Client (Next.js)
-  - Renders UI, calls backend API for auth, profile and tasks.
-  - Environment: `NEXT_PUBLIC_API_URL` points to backend (e.g. `http://localhost:4000/api/v1`).
-- Backend (Express)
-  - REST API (routes under `server/src/api/v1`): auth, user/profile, tasks.
-  - Uses Prisma to connect to a database (Postgres recommended) via `DATABASE_URL`.
-  - JWT auth and secure cookies for session handling.
-
-Mermaid architecture diagram:
+## Architecture
 
 ```mermaid
 graph LR
@@ -49,152 +150,158 @@ graph LR
   end
 ```
 
+- **Frontend:** Renders UI, manages state, calls backend API.
+- **Backend:** REST API, authentication, business logic, database access.
+
+---
+
+## Core Features
+
+**Authentication**
+
+- Sign up, login, logout (JWT & secure cookies).
+- Auth state persisted across reloads.
+
+**Task Management**
+
+- List all tasks (with loading, empty, and error states).
+- Create, edit, and delete tasks (single & bulk).
+- Mark tasks as completed/incomplete.
+- Responsive, accessible UI with feedback (toasts).
+
+**Profile**
+
+- View and update user profile (username, email).
+
+**Bonus (if time permits)**
+
+- Task filtering/search.
+- Task due dates or priorities.
+- UI/UX polish and accessibility improvements.
+
 ---
 
 ## Data Flow
 
-1. User interacts with the UI (create/update/delete tasks, update profile, login/signup).
-2. Client calls backend endpoints (e.g., `POST /tasks/create`, `DELETE /tasks/delete`).
-3. Backend validates requests, checks authentication, and calls services (e.g., `task.service.ts`) which use Prisma to query/update the database.
-4. Backend returns a standardized JSON response. Frontend displays success/error using the toast component (`sonner`) and updates UI state accordingly.
+1. User interacts with the UI (tasks, profile, auth).
+2. Client calls backend endpoints (e.g., `POST /tasks/create`).
+3. Backend validates, authenticates, and processes requests via Prisma.
+4. Backend returns standardized JSON; frontend updates UI and shows toasts.
 
 ---
 
-## Quick Start (Docker Compose)
+## Getting Started
 
-These steps will run the `server` and `client` containers defined in `docker-compose.yaml`.
+### Docker Compose
 
-Prerequisites: Docker and Docker Compose installed.
+**Prerequisites:** Docker & Docker Compose.
 
-1. Copy server environment file and set secrets:
-
-```bash
-cp server/.env.example server/.env
-# Edit server/.env and set DATABASE_URL, JWT_SECRET, FRONTEND_URL, etc.
-```
-
+1. Copy and configure environment variables:
+   ```bash
+   cp server/.env.example server/.env
+   # Edit server/.env: set DATABASE_URL, JWT_SECRET, FRONTEND_URL, etc.
+   ```
 2. Start services:
+   ```bash
+   docker compose up --build
+   ```
+3. Access:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend API: [http://localhost:4000/api/v1](http://localhost:4000/api/v1)
 
-```bash
-docker compose up --build
-```
+> **Note:** The provided `docker-compose.yaml` does **not** start a database container. Use your own Postgres instance or extend the compose file.
 
-3. Visit the frontend at http://localhost:3000 and the backend API at http://localhost:4000/api/v1
+### Local Development
 
-To stop and remove containers:
+**Requirements:** Node.js (>=16), pnpm, Postgres.
 
-```bash
-docker compose down
-```
-
-Notes: the provided `docker-compose.yaml` starts `server` and `client`. It does not start a database container — you can either point `DATABASE_URL` at a managed DB, or add a `postgres` service to the compose file.
-
-Example `DATABASE_URL` for local Postgres container:
-
-```text
-postgresql://postgres:postgres@db:5432/primetrade?schema=public
-```
-
----
-
-## Running locally (without Docker)
-
-Requirements: Node.js (>=16), pnpm, and a Postgres database (or other database supported by Prisma and configured by `DATABASE_URL`).
-
-Server
-
-```bash
-cd server
-pnpm install
-# create/update server/.env with DATABASE_URL, JWT_SECRET, FRONTEND_URL
-pnpm dev
-```
-
-Frontend
-
-```bash
-cd client
-pnpm install
-# set NEXT_PUBLIC_API_URL env var, for example: NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
-pnpm dev
-```
+- **Backend:**
+  ```bash
+  cd server
+  pnpm install
+  # Configure server/.env
+  pnpm dev
+  ```
+- **Frontend:**
+  ```bash
+  cd client
+  pnpm install
+  # Set NEXT_PUBLIC_API_URL (e.g. http://localhost:4000/api/v1)
+  pnpm dev
+  ```
 
 ---
 
-## Environment variables
+## Environment Variables
 
-Server (`server/.env`):
+**Server (`server/.env`):**
 
 - `PORT` (default 4000)
-- `NODE_ENV` (development|production|test)
-- `FRONTEND_URL` (e.g. http://localhost:3000)
-- `DATABASE_URL` (Prisma connection URL)
-- `JWT_SECRET` (secret used for signing tokens)
+- `NODE_ENV`
+- `FRONTEND_URL`
+- `DATABASE_URL`
+- `JWT_SECRET`
 - `USE_HTTPS` (optional)
 
-Client (`client/.env` or passed to build):
+**Client (`client/.env`):**
 
-- `NEXT_PUBLIC_API_URL` (e.g. `http://localhost:4000/api/v1`)
-
----
-
-## API Endpoints (overview)
-
-Main routes (prefix `/api/v1` when calling the server directly — the client library uses `NEXT_PUBLIC_API_URL`):
-
-- Auth
-  - `POST /auth/signup` — register
-  - `POST /auth/login` — login
-  - `POST /auth/logout` — logout
-- Profile / User
-  - `GET /profile` — get current user profile
-  - `PUT /profile/update` — update profile (body: { username, email })
-- Tasks
-  - `POST /tasks/create` — create task
-  - `GET /tasks` — get user tasks
-  - `GET /tasks/:id` — get task by id
-  - `PUT /tasks/update/:id` — update task
-  - `DELETE /tasks/delete/:id` — delete single task
-  - `DELETE /tasks/delete` — bulk delete (body: { ids: string[] })
-
-For full route definitions see `server/src/api/v1`.
+- `NEXT_PUBLIC_API_URL`
 
 ---
 
-## Database / Prisma
+## API Overview
 
-This project uses Prisma as the ORM. The schema is in `server/prisma/schema.prisma`.
+All endpoints are prefixed with `/api/v1`:
 
-To run migrations / generate client locally:
+- **Auth**
+  - `POST /auth/signup`
+  - `POST /auth/login`
+  - `POST /auth/logout`
+- **Profile**
+  - `GET /profile`
+  - `PUT /profile/update`
+- **Tasks**
+  - `POST /tasks/create`
+  - `GET /tasks`
+  - `GET /tasks/:id`
+  - `PUT /tasks/update/:id`
+  - `DELETE /tasks/delete/:id`
+  - `DELETE /tasks/delete` (bulk)
 
-```bash
-cd server
-pnpm prisma generate
-pnpm prisma migrate dev --name init
-```
-
-If you need to reset a development DB (danger: destructive):
-
-```bash
-pnpm prisma migrate reset
-```
+See `server/src/api/v1` for full route definitions.
 
 ---
 
-## Development notes & tips
+## Database & Prisma
 
-- Use `pnpm` as package manager (workspaces are configured).
-- Frontend: `client/app` uses Next.js App Router. Components are under `client/components`.
-- Backend: controllers in `server/src/controllers`, services in `server/src/services`, routes in `server/src/api/v1`.
-- API client helper: `client/lib/fetcher.ts` centralizes axios requests and uses `API` map defined in `client/lib/api.ts`.
+- Prisma schema: `server/prisma/schema.prisma`
+- Migrate & generate client:
+  ```bash
+  cd server
+  pnpm prisma generate
+  pnpm prisma migrate dev --name init
+  ```
+- Reset dev DB (destructive):
+  ```bash
+  pnpm prisma migrate reset
+  ```
+
+---
+
+## Development Notes
+
+- Use `pnpm` (workspaces enabled).
+- Frontend: Next.js App Router, components in `client/components`.
+- Backend: Controllers, services, and routes are modular.
+- API client: `client/lib/fetcher.ts` centralizes requests.
 
 ---
 
 ## Troubleshooting
 
-- If the frontend cannot reach the backend, verify `NEXT_PUBLIC_API_URL` and that `server` is reachable (CORS/ports).
-- Database connection errors: verify `DATABASE_URL`, that the DB is reachable, and run `pnpm prisma generate`.
-- If JWT/Authentication fails, ensure `JWT_SECRET` is set and consistent across environments.
+- **Frontend can't reach backend:** Check `NEXT_PUBLIC_API_URL` and CORS.
+- **DB errors:** Verify `DATABASE_URL` and run `pnpm prisma generate`.
+- **Auth issues:** Ensure `JWT_SECRET` is set and consistent.
 
 ---
 
@@ -206,12 +313,33 @@ pnpm prisma migrate reset
 
 ---
 
-If you want, I can also:
+## 🔐 Security Practices
 
-- Add a `docker-compose.postgres.yml` that includes Postgres for local development.
-- Export an environment file for Postman with `base_url` set.
-- Render and attach the Mermaid diagram as an image.
+- Passwords hashed using bcrypt.
+- JWT-based authentication with middleware validation.
+- Protected routes for authenticated users only.
+- Server-side validation using schema validation.
+- CORS restricted via FRONTEND_URL.
+- Environment variables used for secrets (JWT_SECRET, DATABASE_URL).
 
 ---
 
-Thank you — if you'd like changes to the README format or more details (healthchecks, metrics, CI), tell me what to include.
+## 🚀 Production Scaling Strategy
+
+To scale this application for production:
+
+- Use refresh tokens with rotation and httpOnly cookies.
+- Implement rate limiting (e.g., express-rate-limit).
+- Use Redis for caching frequently accessed data.
+- Add database indexing and connection pooling.
+- Deploy backend behind a load balancer.
+- Use Docker + container orchestration (Kubernetes).
+- Enable CI/CD with GitHub Actions.
+- Use CDN (e.g., Vercel/Cloudflare) for frontend delivery.
+- Introduce logging/monitoring (e.g., Winston + external log service).
+
+---
+
+Postman collection available in `/docs/postman_collection.json`.
+
+**Contact:** For questions, email [maityp394@gmail.com](mailto:maityp394@gmail.com).
