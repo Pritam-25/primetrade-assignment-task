@@ -6,8 +6,8 @@ This repository contains a full-stack task management application developed as p
 
 ## 🌐 Live Demo
 
-- Frontend: https://your-frontend.onrender.com
-- Backend API: https://your-backend.onrender.com/api/v1
+- Frontend: https://primetrade-assignment-task.vercel.app
+- Backend API: https://primetrade-assignment-task.onrender.com/api/v1
 
 ---
 
