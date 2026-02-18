@@ -5,7 +5,7 @@ import {
   getUserTasksService,
   getTaskByIdService,
   updateTaskService,
-  deleteTaskService,
+  deleteTasksService,
 } from './task.service.js';
 
 export { getProfileService, updateProfileService };
@@ -15,5 +15,5 @@ export {
   getUserTasksService,
   getTaskByIdService,
   updateTaskService,
-  deleteTaskService,
+  deleteTasksService,
 };

@@ -4,7 +4,7 @@ import {
   getUserTasksService,
   getTaskByIdService,
   updateTaskService,
-  deleteTaskService,
+  deleteTasksService,
 } from '@services/index.js';
 import { successResponse } from '@utils/apiResponse.js';
 import { ERROR_CODES } from '@utils/errorCodes.js';
@@ -40,10 +40,15 @@ export const updateTask = async (req: Request, res: Response) => {
 };
 
 export const deleteTask = async (req: Request, res: Response) => {
-  const taskId = req.params.id as string;
-  if (!taskId)
-    throw new ApiError(statusCode.badRequest, ERROR_CODES.INVALID_TASK_ID);
+  const taskId = req.params.id as string | undefined;
+  const ids = (req.body && (req.body.ids as string[])) || undefined;
 
-  const result = await deleteTaskService(req.userId, taskId);
-  res.status(200).json(successResponse('Task deleted successfully', result));
+  if (!taskId && (!ids || ids.length === 0))
+    throw new ApiError(statusCode.badRequest, ERROR_CODES.INVALID_TASK_ID);
+  const toDelete = taskId ? taskId : (ids as string[]);
+  const result = await deleteTasksService(req.userId, toDelete);
+  const msg = Array.isArray(toDelete)
+    ? 'Tasks deleted successfully'
+    : 'Task deleted successfully';
+  res.status(200).json(successResponse(msg, result));
 };

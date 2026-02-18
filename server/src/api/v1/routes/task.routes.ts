@@ -25,6 +25,7 @@ router.put(
   validateSchema(updateTaskSchema),
   asyncHandler(updateTask)
 );
+router.delete('/delete', asyncHandler(deleteTask));
 router.delete('/delete/:id', asyncHandler(deleteTask));
 
 export default router;

@@ -65,18 +65,31 @@ export const updateTaskService = async (
   });
 };
 
-export const deleteTaskService = async (userId: string, taskId: string) => {
-  const task = await prisma.task.findFirst({
-    where: { id: taskId, userId },
+
+export const deleteTasksService = async (
+  userId: string,
+  taskIds: string | string[],
+) => {
+  const idsArr = Array.isArray(taskIds) ? taskIds : [taskIds];
+
+  if (!Array.isArray(idsArr) || idsArr.length === 0) {
+    throw new ApiError(statusCode.badRequest, ERROR_CODES.INVALID_TASK_ID);
+  }
+
+  const ownedTasks = await prisma.task.findMany({
+    where: { id: { in: idsArr }, userId },
+    select: { id: true },
   });
 
-  if (!task) {
+  if (ownedTasks.length === 0) {
     throw new ApiError(statusCode.notFound, ERROR_CODES.TASK_NOT_FOUND);
   }
 
-  await prisma.task.delete({
-    where: { id: taskId },
+  const idsToDelete = ownedTasks.map((t) => t.id);
+
+  const result = await prisma.task.deleteMany({
+    where: { id: { in: idsToDelete } },
   });
 
-  return { message: 'Task deleted successfully' };
+  return { deleted: result.count, ids: idsToDelete };
 };

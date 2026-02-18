@@ -30,6 +30,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import CreateTaskDialog from "@/components/web/create-task-dialog";
+import { request } from "@/lib/fetcher";
+import { API } from "@/lib/api";
+import { toast } from "sonner";
 import { Pencil, Trash2 } from "lucide-react";
 
 export type TaskStatus = "pending" | "completed";
@@ -127,13 +130,40 @@ export default function TaskTable({ tasks }: TaskTableProps) {
 
   const handleConfirmDelete = () => {
     if (deleteIds.length === 0) return;
-    setLocalTasks((prev) => prev.filter((t) => !deleteIds.includes(t.id)));
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      deleteIds.forEach((id) => next.delete(id));
-      return next;
-    });
-    setConfirmOpen(false);
+
+    const doDelete = async () => {
+      try {
+        // call backend bulk delete endpoint (server supports single or multiple)
+        const res = await request(API.deleteTasks, "DELETE", {
+          data: { ids: deleteIds },
+        });
+
+        if (res.success) {
+          toast.success(
+            Array.isArray(deleteIds) && deleteIds.length > 1
+              ? `Deleted ${deleteIds.length} tasks`
+              : `Task deleted successfully`,
+          );
+
+          setLocalTasks((prev) =>
+            prev.filter((t) => !deleteIds.includes(t.id)),
+          );
+          setSelectedIds((prev) => {
+            const next = new Set(prev);
+            deleteIds.forEach((id) => next.delete(id));
+            return next;
+          });
+        } else {
+          toast.error(res.errMsg || "Failed to delete task(s)");
+        }
+      } catch (err) {
+        toast.error("Failed to delete task(s)");
+      } finally {
+        setConfirmOpen(false);
+      }
+    };
+
+    void doDelete();
   };
 
   return (

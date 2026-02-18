@@ -7,5 +7,5 @@ export const API = {
   createTask: "/tasks/create",
   getTasks: "/tasks",
   updateTask: (id: string) => `/tasks/update/${id}`,
-  deleteTask: (id: string) => `/tasks/delete/${id}`,
+  deleteTasks: '/tasks/delete',
 } as const;

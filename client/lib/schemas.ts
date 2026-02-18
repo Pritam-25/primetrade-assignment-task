@@ -57,7 +57,6 @@ export const updateTaskSchema = z.object({
 export type CreateTaskInput = z.input<typeof createTaskSchema>;
 export type UpdateTaskInput = z.input<typeof updateTaskSchema>;
 
-
 export const updateUserProfileSchema = z.object({
   username: z
     .string()
