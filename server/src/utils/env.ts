@@ -10,7 +10,8 @@ export const env = createEnv({
     FRONTEND_URL: z.string().default('http://localhost:3000'),
     DATABASE_URL: z.url(),
     JWT_SECRET: z.string(),
-    USE_HTTPS: z.string().default('true'),
+    // In development we serve over HTTP; default to 'false' so cookies are set locally
+    USE_HTTPS: z.string().default('false'),
   },
 
   runtimeEnv: process.env,

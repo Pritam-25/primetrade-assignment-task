@@ -14,17 +14,17 @@ import { asyncHandler } from '@utils/asyncHandler.js';
 const router: Router = Router();
 
 router.post(
-  '/',
+  '/create',
   validateSchema(createOrUpdateTaskSchema),
   asyncHandler(createTask)
 );
 router.get('/', getUserTasks);
 router.get('/:id', getTaskById);
 router.patch(
-  '/:id',
+  '/update/:id',
   validateSchema(createOrUpdateTaskSchema),
   asyncHandler(updateTask)
 );
-router.delete('/:id', asyncHandler(deleteTask));
+router.delete('/delete/:id', asyncHandler(deleteTask));
 
 export default router;

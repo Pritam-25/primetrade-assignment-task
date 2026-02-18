@@ -6,25 +6,37 @@ export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
-  // Only apply to login/signup pages
+  // Pages that should only be accessible when NOT authenticated
   const authPages = ["/login", "/signup"];
 
-  if (authPages.includes(pathname)) {
-    // Check if JWT cookie exists
-    const jwt = request.cookies.get("jwt")?.value;
+  // Protected pages that require authentication
+  const protectedRoutes = ["/tasks"];
 
-    if (jwt) {
-      // User is logged in → redirect to /tasks
-      url.pathname = "/tasks";
-      return NextResponse.redirect(url);
-    }
+  const jwt = request.cookies.get("jwt")?.value;
+
+  // Redirect logged-in users away from auth pages
+  if (authPages.includes(pathname) && jwt) {
+    url.pathname = "/tasks";
+    return NextResponse.redirect(url);
+  }
+
+  // Protect /tasks page
+  if (protectedRoutes.includes(pathname) && !jwt) {
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect logged-in users from landing page
+  if (pathname === "/" && jwt) {
+    url.pathname = "/tasks";
+    return NextResponse.redirect(url);
   }
 
   // Otherwise, allow access
   return NextResponse.next();
 }
 
-// Specify which routes this proxy applies to
+// Apply proxy to these routes
 export const config = {
-  matcher: ["/login", "/signup"],
+  matcher: ["/", "/login", "/signup", "/tasks"],
 };

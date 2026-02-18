@@ -2,12 +2,12 @@ import type { Response } from 'express';
 import { env } from './env.js';
 
 export const setAuthCookie = (res: Response, token: string) => {
-  const isHttps = String(env.USE_HTTPS || '').toLowerCase() === 'true';
+  const isProduction = env.NODE_ENV === 'production';
 
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: isHttps,
-    sameSite: isHttps ? 'none' : 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     path: '/',
     maxAge: 15 * 24 * 60 * 60 * 1000,
   });

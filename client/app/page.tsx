@@ -21,7 +21,7 @@ export default function LandingPage() {
             started.
           </CardDescription>
 
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-col gap-4 w-full">
             <Link
               href="/login"
               className={cn(buttonVariants({ variant: "default" }), "w-full")}
@@ -30,7 +30,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/signup"
-              className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+              className={cn(buttonVariants({ variant: "secondary" }), "w-full")}
             >
               Register
             </Link>

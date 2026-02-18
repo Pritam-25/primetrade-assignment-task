@@ -30,5 +30,19 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Invalid Credentials"),
 });
 
-export type SignupInput = z.infer<typeof signupSchema>;
-export type LoginInput = z.infer<typeof loginSchema>;
+export type SignupInput = z.input<typeof signupSchema>;
+export type LoginInput = z.input<typeof loginSchema>;
+
+export const createOrUpdateTaskSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(3, "Title must be at least 3 characters")
+    .max(30, "Title must not exceed 30 characters"),
+
+  description: z.string().optional(),
+  status: z.enum(["PENDING", "COMPLETED"]).default("PENDING"),
+});
+
+export type CreateTaskInput = z.input<typeof createOrUpdateTaskSchema>;
+export type UpdateTaskInput = z.input<typeof createOrUpdateTaskSchema>;
