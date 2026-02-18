@@ -5,6 +5,7 @@ import { env } from '@utils/env.js';
 import { errorHandler } from '@middleware/index.js';
 import { requireAuth } from '@middleware/auth.middleware.js';
 import { userRoutes, authRoutes } from '@routes/index.js';
+import { taskRoutes } from '@routes/index.js';
 
 const app: Express = express();
 app.use(express.json());
@@ -23,11 +24,12 @@ apiRouter.use('/auth', authRoutes);
 
 // Protected routes
 apiRouter.use('/user', requireAuth, userRoutes);
+apiRouter.use('/tasks', requireAuth, taskRoutes);
 
 // Mount v1
 app.use('/api/v1', apiRouter);
 
-// Error handler (ALWAYS LAST)
+// Error handler
 app.use(errorHandler);
 
 export default app;

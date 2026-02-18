@@ -1,7 +1,6 @@
 import z from 'zod';
 import { passwordSchema } from './auth.schema.js';
 
-
 export const updateUserProfileSchema = z.object({
   username: z
     .string()

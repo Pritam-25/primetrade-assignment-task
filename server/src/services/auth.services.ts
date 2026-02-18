@@ -5,7 +5,6 @@ import { ERROR_CODES } from '@utils/errorCodes.js';
 import { statusCode } from '@utils/statusCodes.js';
 import bcrypt from 'bcrypt';
 
-
 // ------------- signup service ----------------
 export const signupService = async (data: SignupInput) => {
   // check if user already exists
