@@ -4,7 +4,10 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { User } from "lucide-react";
 
-import UpdateProfileDialog, { Profile } from "./_components/UpdateProfileDialog";
+import UpdateProfileDialog, {
+  Profile,
+} from "./_components/UpdateProfileDialog";
+import ProfileSkeleton from "./_components/ProfileSkeleton";
 import { fetcher, request } from "@/lib/fetcher";
 import { API } from "@/lib/api";
 import { env } from "@/utils/env";
@@ -18,7 +21,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Empty } from "@/components/ui/empty";
 
 export default function ProfilePage() {
@@ -31,10 +33,6 @@ export default function ProfilePage() {
 
   const profile = data?.data ?? null;
 
-  const skeletonText = (width: string, height: string = "h-6") => (
-    <Skeleton className={`${height} ${width} rounded-md`} />
-  );
-
   const handleLogout = async () => {
     try {
       const res = await request(API.logout, "POST");
@@ -46,19 +44,17 @@ export default function ProfilePage() {
     }
   };
 
-  // Show consistent empty state if profile is not loaded and not loading
-  if (!isLoading && !profile) {
+  if (isLoading) return <ProfileSkeleton />;
+
+  // Show consistent empty state when profile isn't present
+  if (!profile) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
+      <div className="max-w-3xl mx-auto p-6">
         <Card className="text-center space-y-4 py-6">
           <Empty>
             <User className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-lg font-medium text-gray-600">
-              No profile found
-            </p>
-            <p className="text-gray-500 text-sm">
-              Please login or reload the page
-            </p>
+            <p className="mt-2 text-lg font-medium">No profile found</p>
+            <p className="text-sm">Please login or reload the page</p>
           </Empty>
         </Card>
       </div>
@@ -66,47 +62,21 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <Card className="space-y-4">
-        <CardHeader>
-          <CardTitle className="text-xl">
-            {isLoading
-              ? skeletonText("w-48", "h-6")
-              : `Welcome${profile?.username ? `, ${profile.username}` : "!"}`}
-          </CardTitle>
-          <CardDescription>
-            {isLoading ? skeletonText("w-72", "h-4") : (profile?.email ?? "")}
-          </CardDescription>
-        </CardHeader>
+    <div className="max-w-3xl mx-auto p-6">
+      <Card>
+        <CardContent>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-muted rounded-full h-16 w-16 flex items-center justify-center">
+                <User className="h-8 w-8 text-gray-600" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold">{profile.username}</h2>
+                <p className="text-sm text-muted-foreground">{profile.email}</p>
+              </div>
+            </div>
 
-        <CardContent className="space-y-4">
-          <div>
-            <div className="text-sm font-medium text-gray-600">Full Name</div>
-            {isLoading ? (
-              skeletonText("w-full", "h-9")
-            ) : (
-              <div className="mt-2 text-base">{profile?.username}</div>
-            )}
-          </div>
-
-          <div>
-            <div className="text-sm font-medium text-gray-600">Email</div>
-            {isLoading ? (
-              skeletonText("w-full", "h-9")
-            ) : (
-              <div className="mt-2 text-base">{profile?.email}</div>
-            )}
-          </div>
-        </CardContent>
-
-        <CardFooter className="flex gap-2">
-          {isLoading ? (
-            <>
-              {skeletonText("w-24", "h-9")}
-              {skeletonText("w-24", "h-9")}
-            </>
-          ) : (
-            <>
+            <div className="flex items-center gap-3">
               <UpdateProfileDialog
                 profile={profile}
                 onUpdate={(updated) => mutate({ data: updated }, false)}
@@ -114,9 +84,37 @@ export default function ProfilePage() {
               <Button variant="outline" onClick={handleLogout}>
                 Logout
               </Button>
-            </>
-          )}
-        </CardFooter>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <Card className="p-4">
+              <CardHeader>
+                <CardTitle className="text-lg">Account Details</CardTitle>
+                <CardDescription>
+                  Personal information and settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Full Name
+                    </div>
+                    <div className="mt-1 text-base">{profile.username}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Email
+                    </div>
+                    <div className="mt-1 text-base">{profile.email}</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

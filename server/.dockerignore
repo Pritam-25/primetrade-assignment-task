@@ -1,0 +1,15 @@
+node_modules
+.pnpm-store
+.git
+.gitignore
+Dockerfile
+.env
+.env.*
+README.md
+dist
+coverage
+tmp
+logs
+*.log
+.vscode
+.husky

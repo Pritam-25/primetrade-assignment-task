@@ -1,0 +1,41 @@
+# -----------------------------
+# 1️⃣ Builder Stage
+# -----------------------------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+RUN corepack enable
+
+# Copy package + prisma FIRST (because of postinstall)
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma
+
+# Install dependencies (postinstall will now succeed)
+RUN pnpm install --frozen-lockfile
+
+# Copy rest of the source code
+COPY . .
+
+# Build TypeScript
+RUN pnpm build
+
+# Remove dev dependencies
+RUN pnpm prune --prod
+
+
+# -----------------------------
+# 2️⃣ Production Stage
+# -----------------------------
+FROM node:20-alpine
+
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/dist ./dist
+COPY package.json ./
+
+EXPOSE 4000
+
+CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
