@@ -5,9 +5,11 @@ import { env } from '@utils/env.js';
 import { errorHandler } from '@middleware/index.js';
 import { requireAuth } from '@middleware/auth.middleware.js';
 import { userRoutes, authRoutes } from '@routes/index.js';
+import cookieParser from 'cookie-parser';
 import { taskRoutes } from '@routes/index.js';
 
 const app: Express = express();
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(
