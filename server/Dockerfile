@@ -39,5 +39,5 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 EXPOSE 4000
 
-CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
+CMD ["node", "dist/index.js"]
 
