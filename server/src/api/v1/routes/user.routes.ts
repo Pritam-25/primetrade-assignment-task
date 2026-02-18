@@ -1,10 +1,17 @@
 import { asyncHandler } from '@utils/asyncHandler.js';
 import { Router } from 'express';
+import { getProfileInfo, updateProfileInfo } from '@controllers/index.js';
+import { validateSchema } from '@middleware/validate.middleware.js';
+import { updateUserProfileSchema } from '@schemas/user.schema.js';
 
 const router: Router = Router();
 
-router.get('/', asyncHandler(async (_req, res) => {
-  res.json({ message: 'User route is working!' });
-}));
+router.get('/profile', asyncHandler(getProfileInfo));
+
+router.put(
+  '/profile/update',
+  validateSchema(updateUserProfileSchema),
+  asyncHandler(updateProfileInfo)
+);
 
 export default router;

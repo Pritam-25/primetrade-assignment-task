@@ -1,25 +1,33 @@
 import 'dotenv/config';
 import express, { Express, Router } from 'express';
-import { errorHandler } from '@middleware/index.js';
 import cors from 'cors';
 import { env } from '@utils/env.js';
+import { errorHandler } from '@middleware/index.js';
+import { requireAuth } from '@middleware/auth.middleware.js';
+import { userRoutes, authRoutes } from '@routes/index.js';
 
 const app: Express = express();
 app.use(express.json());
 
-const apiRouter: Router = Router();
-
 app.use(
   cors({
-    origin: env.FRONTEND_URL, // Next.js frontend
+    origin: env.FRONTEND_URL,
     credentials: true,
   })
 );
 
-// Mount auth router under /api/v1/auth
-app.use('/api/v1/auth', apiRouter);
+const apiRouter: Router = Router();
 
-// error handling middleware
+// Public routes
+apiRouter.use('/auth', authRoutes);
+
+// Protected routes
+apiRouter.use('/user', requireAuth, userRoutes);
+
+// Mount v1
+app.use('/api/v1', apiRouter);
+
+// Error handler (ALWAYS LAST)
 app.use(errorHandler);
 
 export default app;

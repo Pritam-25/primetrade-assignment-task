@@ -13,7 +13,7 @@ export const errorHandler = (
   if (err instanceof ApiError) {
     return res
       .status(err.statusCode)
-      .json(errorResponse(err.errorCode, err.name));
+      .json(errorResponse(err.errorCode, err.message));
   }
 
   // unknown error
@@ -21,5 +21,5 @@ export const errorHandler = (
 
   return res
     .status(statusCode.internalError)
-    .json(errorResponse(ERROR_CODES.INTERNAL_ERROR, err.name));
+    .json(errorResponse(ERROR_CODES.INTERNAL_ERROR, err.message));
 };
