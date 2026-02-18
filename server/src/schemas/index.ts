@@ -1,4 +1,3 @@
-import { uploadSchema } from './upload.schema.js';
 import { loginSchema } from './auth.schema.js';
-
-export { uploadSchema, loginSchema };
+import { signupSchema } from './auth.schema.js';
+export { signupSchema, loginSchema };

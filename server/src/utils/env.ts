@@ -9,6 +9,8 @@ export const env = createEnv({
       .default('development'),
     FRONTEND_URL: z.string().default('http://localhost:3000'),
     DATABASE_URL: z.url(),
+    JWT_SECRET: z.string(),
+    USE_HTTPS: z.string().default('true'),
   },
 
   runtimeEnv: process.env,

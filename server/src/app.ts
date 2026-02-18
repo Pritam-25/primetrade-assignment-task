@@ -16,7 +16,8 @@ app.use(
   })
 );
 
-app.use('/api', apiRouter);
+// Mount auth router under /api/v1/auth
+app.use('/api/v1/auth', apiRouter);
 
 // error handling middleware
 app.use(errorHandler);
