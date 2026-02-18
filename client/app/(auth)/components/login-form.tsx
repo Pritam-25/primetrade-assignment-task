@@ -5,48 +5,40 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { SignupInput } from "@/lib/schemas";
-import { signupSchema } from "@/lib/schemas";
-import { useTransition } from "react";
-import { request } from "@/lib/fetcher";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { loginSchema, LoginInput } from "@/lib/schemas";
+import { request } from "@/lib/fetcher";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/passwordInput";
 import { Loader2 } from "lucide-react";
 import { API } from "@/lib/api";
+import { useTransition } from "react";
 
-type UserResponse = {
-  username: string;
-  email: string;
-  id: string;
-};
-
-export function SignUpForm({
+export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<SignupInput>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
     },
   });
-  const onSubmit = (values: SignupInput) => {
+
+  const onSubmit = (values: LoginInput) => {
     startTransition(async () => {
-      const res = await request<{ user: UserResponse }>(
-        API.signup,
+      const res = await request<{ user?: unknown; token?: string }>(
+        API.login,
         "POST",
         { data: values },
-        "Failed to sign up",
+        "Failed to login",
       );
 
       if (!res.success) {
@@ -54,7 +46,7 @@ export function SignUpForm({
         return;
       }
 
-      toast.success(res.message || "Successfully signed up!");
+      toast.success(res.message || "Login successful!");
       router.replace("/tasks");
     });
   };
@@ -71,27 +63,11 @@ export function SignUpForm({
               <FieldSet>
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col items-center text-center">
-                    <h1 className="text-2xl font-bold">Create your account</h1>
+                    <h1 className="text-2xl font-bold">Welcome back</h1>
                     <p className="text-muted-foreground text-balance">
-                      Sign up to start using ChatApp
+                      Login to your ChatApp account
                     </p>
                   </div>
-
-                  {/* Username */}
-                  <Field>
-                    <FieldLabel htmlFor="username">Username</FieldLabel>
-                    <Input
-                      id="username"
-                      placeholder="Your username"
-                      autoFocus
-                      {...form.register("username")}
-                    />
-                    {form.formState.errors.username && (
-                      <p className="text-sm text-destructive">
-                        {form.formState.errors.username.message as string}
-                      </p>
-                    )}
-                  </Field>
 
                   {/* Email */}
                   <Field>
@@ -100,6 +76,7 @@ export function SignUpForm({
                       id="email"
                       type="email"
                       placeholder="m@example.com"
+                      autoFocus
                       {...form.register("email")}
                     />
                     {form.formState.errors.email && (
@@ -111,7 +88,15 @@ export function SignUpForm({
 
                   {/* Password */}
                   <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor="password">Password</FieldLabel>
+                      <Link
+                        href="/forgot-password"
+                        className="ml-auto text-sm underline-offset-2 hover:underline"
+                      >
+                        Forgot your password?
+                      </Link>
+                    </div>
                     <PasswordInput
                       id="password"
                       placeholder="••••••••"
@@ -128,26 +113,26 @@ export function SignUpForm({
                     <Button
                       type="submit"
                       className="w-full cursor-pointer"
-                      disabled={isPending}
+                      disabled={form.formState.isSubmitting || isPending}
                     >
-                      {form.formState.isSubmitting ? (
+                      {form.formState.isSubmitting || isPending ? (
                         <span className="flex items-center justify-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Signing up...
+                          Logging in...
                         </span>
                       ) : (
-                        "Sign Up"
+                        "Login"
                       )}
                     </Button>
                   </div>
 
                   <div className="text-center text-sm">
-                    Already have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link
-                      href="/login"
+                      href="/signup"
                       className="underline underline-offset-4"
                     >
-                      Log in
+                      Sign up
                     </Link>
                   </div>
                 </div>

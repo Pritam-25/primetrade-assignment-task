@@ -25,7 +25,7 @@ export const request = async <TResponse, TData = unknown, TParams = unknown>(
   fallbackMessage = "Something went wrong.",
 ): Promise<ApiResponse<TResponse>> => {
   try {
-    const url= endpoint in API ? API[endpoint as keyof typeof API] : endpoint;
+    const url = endpoint in API ? API[endpoint as keyof typeof API] : endpoint;
 
     const config: AxiosRequestConfig = {
       method,
@@ -45,3 +45,4 @@ export const request = async <TResponse, TData = unknown, TParams = unknown>(
     return { success: false, errMsg: message };
   }
 };
+
