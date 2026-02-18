@@ -1,5 +1,5 @@
 # -----------------------------
-# 1️⃣ Builder Stage
+# 1️ Builder Stage
 # -----------------------------
 FROM node:20-alpine AS builder
 
@@ -24,7 +24,7 @@ RUN pnpm prune --prod
 
 
 # -----------------------------
-# 2️⃣ Production Stage
+# 2️ Production Stage
 # -----------------------------
 FROM node:20-alpine
 
@@ -34,8 +34,10 @@ ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
-COPY package.json ./
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 EXPOSE 4000
 
-CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node -r tsconfig-paths/register dist/index.js"]
+

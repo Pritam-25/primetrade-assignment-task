@@ -70,7 +70,7 @@ export function CreateTaskDialog({
 
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<any>({
+  const form = useForm<CreateTaskInput | UpdateTaskInput>({
     resolver: zodResolver(
       mode === "create" ? createTaskSchema : updateTaskSchema,
     ),
@@ -225,12 +225,6 @@ export function CreateTaskDialog({
                     </Select>
                   )}
                 />
-
-                {form.formState.errors.status && (
-                  <FieldError>
-                    {form.formState.errors.status.message as string}
-                  </FieldError>
-                )}
               </Field>
             )}
           </FieldSet>
