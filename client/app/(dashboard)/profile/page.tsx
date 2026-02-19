@@ -67,7 +67,7 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="bg-muted rounded-full h-16 w-16 flex items-center justify-center">
-                <User className="h-8 w-8 text-gray-600" />
+                <User className="h-8 w-8" />
               </div>
               <div>
                 <h2 className="text-2xl font-semibold">{profile.username}</h2>

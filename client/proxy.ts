@@ -3,35 +3,56 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/utils/env";
 import { API } from "./lib/api";
+import { ur } from "zod/locales";
 
 export async function proxy(request: NextRequest) {
-  // Get all cookies from the incoming request
   const cookieHeader = request.headers.get("cookie") || "";
-  console.log("Proxying request with cookies:", cookieHeader);
+  const url = request.nextUrl.clone();
+  const pathname = url.pathname;
 
-  // Forward the cookies to the backend's profile/auth endpoint
+  // Pages only for guests (not logged in)
+  const authPages = ["/login", "/signup"];
+
+  // Protected pages that require login
+  const protectedRoutes = ["/tasks", "/profile"];
+
+  let isLoggedIn = false;
   try {
     const profileEndpoint = `${env.NEXT_PUBLIC_API_URL}${API.user}`;
 
     const profileRes = await fetch(profileEndpoint, {
       method: "GET",
       headers: {
-        cookie: cookieHeader, // <-- forward cookies here
+        cookie: cookieHeader,
       },
-      credentials: "include", // include cookies for cross-origin
     });
 
-    // Optional: set a header so frontend can debug if user is logged in
-    const response = NextResponse.next();
-    response.headers.set("x-is-logged-in", profileRes.ok ? "true" : "false");
-    return response;
+    isLoggedIn = profileRes.ok;
   } catch (err) {
-    // On error, continue the request without blocking
-    return NextResponse.next();
+    isLoggedIn = false;
   }
+
+  // Redirect logged in users away from auth pages
+  if (authPages.includes(pathname) && isLoggedIn) {
+    url.pathname = "/tasks";
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect logged out users to login page for protected routes
+  if (protectedRoutes.includes(pathname) && !isLoggedIn) {
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // redirect logged in user form landing page to tasks page
+  if (pathname === "/" && isLoggedIn) {
+    url.pathname = "/tasks";
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
-// Apply middleware only to routes you want to forward cookies on
 export const config = {
-  matcher: ["/tasks", "/profile", "/login", "/signup", "/"],
+  matcher: ["/tasks/:path*", "/profile/:path*", "/login", "/signup", "/"],
 };
