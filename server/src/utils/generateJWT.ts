@@ -5,7 +5,7 @@ export const setAuthCookie = (res: Response, token: string) => {
   const isProduction = env.NODE_ENV === 'production';
 
   res.cookie('jwt', token, {
-    httpOnly: true,
+    httpOnly: true, // browser JS can't access this cookie
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
     path: '/',

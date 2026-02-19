@@ -18,7 +18,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
@@ -38,7 +37,7 @@ export default function ProfilePage() {
       const res = await request(API.logout, "POST");
       if (!res.success) throw new Error(res.errMsg || "Failed to logout");
       toast.success("Logged out successfully");
-      window.location.href = "/auth/login";
+      window.location.href = "/login";
     } catch (err) {
       toast.error((err as Error).message || "Failed to logout");
     }

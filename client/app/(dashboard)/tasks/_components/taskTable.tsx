@@ -33,7 +33,7 @@ import CreateTaskDialog from "@/components/web/create-task-dialog";
 import { request } from "@/lib/fetcher";
 import { API } from "@/lib/api";
 import { toast } from "sonner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Search, Trash2 } from "lucide-react";
 
 export type TaskStatus = "pending" | "completed";
 
@@ -169,10 +169,11 @@ export default function TaskTable({ tasks }: TaskTableProps) {
   return (
     <div className="space-y-4">
       {/* Search & Filter */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center">
+      <div className="flex flex-row gap-4 items-center">
         <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            className="pl-3"
+            className="pl-10"
             placeholder="Search tasks..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}

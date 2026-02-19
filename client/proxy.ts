@@ -6,27 +6,29 @@ export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
-  // Pages that should only be accessible when NOT authenticated
+  // Pages only for guests (not logged in)
   const authPages = ["/login", "/signup"];
 
-  // Protected pages that require authentication
-  const protectedRoutes = ["/tasks"];
+  // Protected pages that require login
+  const protectedRoutes = ["/tasks", "/profile"];
 
+  // Check if JWT cookie exists
   const jwt = request.cookies.get("jwt")?.value;
 
-  // Redirect logged-in users away from auth pages
+  // Redirect logged-in users away from login/signup pages
   if (authPages.includes(pathname) && jwt) {
+    console.log("User is authenticated, redirecting to tasks from proxy");
     url.pathname = "/tasks";
     return NextResponse.redirect(url);
   }
 
-  // Protect /tasks page
+  // Redirect unauthenticated users from protected pages
   if (protectedRoutes.includes(pathname) && !jwt) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // Redirect logged-in users from landing page
+  // Redirect logged-in users from landing page to tasks
   if (pathname === "/" && jwt) {
     url.pathname = "/tasks";
     return NextResponse.redirect(url);
@@ -36,7 +38,7 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Apply proxy to these routes
+// Apply middleware to these routes
 export const config = {
-  matcher: ["/", "/login", "/signup", "/tasks"],
+  matcher: ["/", "/login", "/signup", "/tasks", "/profile"],
 };

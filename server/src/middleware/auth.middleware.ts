@@ -8,13 +8,21 @@ import jwt from 'jsonwebtoken';
 
 export const requireAuth = async (
   req: Request,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) => {
   try {
     const token = req.cookies.jwt;
+    console.log('Checking auth with token:', token);
 
     if (!token) {
+      // clear any stale/invalid jwt cookie (match cookie options used when setting it)
+      try {
+        res.clearCookie('jwt', { httpOnly: true, path: '/' });
+      } catch (err) {
+        console.error('Failed to clear jwt cookie:', err);
+      }
+
       throw new ApiError(
         statusCode.unauthorized,
         ERROR_CODES.NOT_AUTHENTICATED
@@ -33,6 +41,13 @@ export const requireAuth = async (
     });
 
     if (!user) {
+      // clear jwt when the referenced user no longer exists
+      try {
+        res.clearCookie('jwt', { httpOnly: true, path: '/' });
+      } catch (err) {
+        console.error('Failed to clear jwt cookie for deleted user:', err);
+      }
+
       throw new ApiError(
         statusCode.unauthorized,
         ERROR_CODES.NOT_AUTHENTICATED
@@ -43,7 +58,14 @@ export const requireAuth = async (
     req.userId = user.id;
 
     next();
-  } catch {
+  } catch (err) {
+    // ensure cookie is cleared on any auth failure
+    try {
+      res.clearCookie('jwt', { httpOnly: true, path: '/' });
+    } catch (clearErr) {
+      console.error('Failed to clear jwt cookie on auth error:', clearErr);
+    }
+
     throw new ApiError(statusCode.unauthorized, ERROR_CODES.NOT_AUTHENTICATED);
   }
 };
