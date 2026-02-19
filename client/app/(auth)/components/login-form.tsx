@@ -46,6 +46,7 @@ export function LoginForm({
         return;
       }
 
+      console.log("redirecting to tasks page... after successful login");
       toast.success(res.message || "Login successful!");
       router.replace("/tasks");
     });
