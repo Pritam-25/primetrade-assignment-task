@@ -13,9 +13,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import TaskSkeleton from "./_components/taskSkeleton";
+import { getBaseUrl } from "@/utils/getBaseURL";
 
 export default function TasksPage() {
-  const url = process.env.NEXT_PUBLIC_API_URL + API.getTasks;
+  const url = getBaseUrl() + API.getTasks;
+
   // Use SWR to fetch the profile
   const { data, isLoading } = useSWR<{ data: Task[] }>(url, fetcher, {
     revalidateOnFocus: false, // optional: don't refetch when window focuses

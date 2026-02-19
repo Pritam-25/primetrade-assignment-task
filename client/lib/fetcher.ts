@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { API } from "./api";
 import { ApiResponse } from "@/utils/apiResponse";
+import { getBaseUrl } from "@/utils/getBaseURL";
 
 export const fetcher = (url: string) =>
   fetch(url, { credentials: "include" }).then((res) => res.json());
@@ -14,10 +15,7 @@ export interface MutationOptions<TData = unknown, TParams = unknown> {
   params?: TParams; // optional query params
 }
 
-const baseURL =
-  process.env.NODE_ENV === "production"
-    ? "/api"
-    : process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+const baseURL = getBaseUrl();
 // Centralized axios instance (optional)
 const axiosInstance = axios.create({
   baseURL: baseURL,

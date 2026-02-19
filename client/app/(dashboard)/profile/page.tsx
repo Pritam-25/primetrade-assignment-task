@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
+import { getBaseUrl } from "@/utils/getBaseURL";
 
 export default function ProfilePage() {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}${API.user}`;
+  const url = getBaseUrl() + API.user;
 
   const { data, isLoading, mutate } = useSWR<{ data: Profile }>(url, fetcher, {
     revalidateOnFocus: false,
