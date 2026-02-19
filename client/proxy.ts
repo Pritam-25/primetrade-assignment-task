@@ -1,8 +1,10 @@
 // proxy.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { env } from "@/utils/env";
+import { API } from "./lib/api";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
@@ -12,24 +14,42 @@ export function proxy(request: NextRequest) {
   // Protected pages that require login
   const protectedRoutes = ["/tasks", "/profile"];
 
-  // Check if JWT cookie exists
-  const jwt = request.cookies.get("jwt")?.value;
+  // Forward cookies to backend profile endpoint because middleware cannot
+  // read httpOnly cookies set on a different domain in production.
+  const cookieHeader = request.headers.get("cookie") || "";
+
+  let isLoggedIn = false;
+  try {
+    const profileEndpoint = `${env.NEXT_PUBLIC_API_URL}${API.user}`;
+
+    const profileRes = await fetch(profileEndpoint, {
+      method: "GET",
+      headers: {
+        cookie: cookieHeader,
+      },
+      credentials: "include",
+    });
+
+    isLoggedIn = profileRes.ok;
+  } catch (err) {
+    isLoggedIn = false;
+  }
 
   // Redirect logged-in users away from login/signup pages
-  if (authPages.includes(pathname) && jwt) {
+  if (authPages.includes(pathname) && isLoggedIn) {
     console.log("User is authenticated, redirecting to tasks from proxy");
     url.pathname = "/tasks";
     return NextResponse.redirect(url);
   }
 
   // Redirect unauthenticated users from protected pages
-  if (protectedRoutes.includes(pathname) && !jwt) {
+  if (protectedRoutes.includes(pathname) && !isLoggedIn) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
   // Redirect logged-in users from landing page to tasks
-  if (pathname === "/" && jwt) {
+  if (pathname === "/" && isLoggedIn) {
     url.pathname = "/tasks";
     return NextResponse.redirect(url);
   }
