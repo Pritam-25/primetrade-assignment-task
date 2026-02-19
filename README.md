@@ -7,7 +7,9 @@ This repository contains a full-stack task management application developed as p
 ## 🌐 Live Demo
 
 - Frontend: https://primetrade-assignment-task.vercel.app
-- Backend API: https://primetrade-assignment-task.onrender.com/api/v1
+- Backend API: https://primetrade-assignment-task.onrender.com
+
+> ⚠️ Heads up: The backend is hosted on Render’s free plan. The first request might take a few seconds while the server “wakes up.” Thanks for your patience!
 
 ---
 
@@ -207,7 +209,7 @@ graph LR
    ```
 3. Access:
    - Frontend: [http://localhost:3000](http://localhost:3000)
-   - Backend API: [http://localhost:4000/api/v1](http://localhost:4000/api/v1)
+   - Backend API: [http://localhost:4000](http://localhost:4000)
 
 > **Note:** The provided `docker-compose.yaml` does **not** start a database container. Use your own Postgres instance or extend the compose file.
 
@@ -340,6 +342,6 @@ To scale this application for production:
 
 ---
 
-Postman collection available in `/docs/postman_collection.json`.
+Postman collection available at `primetrade-api.postman_collection.json`.
 
 **Contact:** For questions, email [maityp394@gmail.com](mailto:maityp394@gmail.com).

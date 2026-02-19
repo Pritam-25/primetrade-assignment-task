@@ -2,7 +2,7 @@
   "info": {
     "name": "PrimeTrade API v1 - Example",
     "_postman_id": "c3b2f6a4-0000-4000-8000-000000000000",
-    "description": "Collection for PrimeTrade backend task - grouped endpoints and example request bodies. Use an environment with `base_url` set to your server (e.g. http://localhost:4000/api/v1).",
+    "description": "Collection for PrimeTrade backend task - grouped endpoints and example request bodies. Use `{{base_url}}` to switch between your local server and the deployed Render backend.\n\nOptions:\n- Local: http://localhost:4000/api/v1\n- Deployed: https://primetrade-assignment-task.onrender.com/api/v1\n\nNote: The deployed Render free-tier may take a few seconds to wake up on the first request.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -190,6 +190,11 @@
     {
       "key": "base_url",
       "value": "http://localhost:4000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "deployed_base_url",
+      "value": "https://primetrade-assignment-task.onrender.com/api/v1",
       "type": "string"
     }
   ]
