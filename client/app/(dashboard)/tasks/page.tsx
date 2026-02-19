@@ -16,7 +16,7 @@ import {
 import TaskSkeleton from "./_components/taskSkeleton";
 
 export default function TasksPage() {
-  const url = env.NEXT_PUBLIC_API_URL + API.getTasks;
+  const url = process.env.NEXT_PUBLIC_API_URL + API.getTasks;
   // Use SWR to fetch the profile
   const { data, isLoading } = useSWR<{ data: Task[] }>(url, fetcher, {
     revalidateOnFocus: false, // optional: don't refetch when window focuses
@@ -34,9 +34,7 @@ export default function TasksPage() {
 
   if (isLoading) {
     // Skeleton placeholder for table while loading
-    return (
-      <TaskSkeleton />
-    );
+    return <TaskSkeleton />;
   }
 
   return (

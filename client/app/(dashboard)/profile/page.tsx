@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
 
 export default function ProfilePage() {
-  const url = `${env.NEXT_PUBLIC_API_URL}${API.user}`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}${API.user}`;
 
   const { data, isLoading, mutate } = useSWR<{ data: Profile }>(url, fetcher, {
     revalidateOnFocus: false,

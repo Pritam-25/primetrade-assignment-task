@@ -110,7 +110,7 @@ export function CreateTaskDialog({
         setOpen(false);
         // refresh to revalidate Next data and also revalidate SWR cache
         router.refresh();
-        mutate(env.NEXT_PUBLIC_API_URL + API.getTasks);
+        mutate(process.env.NEXT_PUBLIC_API_URL + API.getTasks);
         return;
       }
 
@@ -132,7 +132,7 @@ export function CreateTaskDialog({
         setOpen(false);
         // refresh to revalidate Next data and also revalidate SWR cache
         router.refresh();
-        mutate(env.NEXT_PUBLIC_API_URL + API.getTasks);
+        mutate(process.env.NEXT_PUBLIC_API_URL + API.getTasks);
         return;
       }
     });

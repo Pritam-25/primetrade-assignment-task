@@ -15,9 +15,13 @@ export interface MutationOptions<TData = unknown, TParams = unknown> {
   params?: TParams; // optional query params
 }
 
+const baseURL =
+  env.NODE_ENV === "production"
+    ? "/api"
+    : process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 // Centralized axios instance (optional)
 const axiosInstance = axios.create({
-  baseURL: env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1",
+  baseURL: baseURL,
   withCredentials: true, // send cookies automatically
   headers: {
     "Content-Type": "application/json",
