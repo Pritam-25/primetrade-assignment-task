@@ -10,6 +10,5 @@ export const setAuthCookie = (res: Response, token: string) => {
     sameSite: isProduction ? 'none' : 'lax',
     path: '/',
     maxAge: 15 * 24 * 60 * 60 * 1000,
-    domain: isProduction ? env.COOKIE_DOMAIN : undefined,
   });
 };
