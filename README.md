@@ -17,7 +17,7 @@ This repository contains a full-stack task management application developed as p
 
 **Frontend:**
 
-- Next.js 14 (App Router)
+- Next.js 16 (App Router)
 - React + TypeScript
 - TailwindCSS
 - shadcn/ui
@@ -117,7 +117,7 @@ sequenceDiagram
 
 This repository contains a full-stack task management application developed as part of a Frontend Developer technical assessment. The project is split into:
 
-- `client/` — Next.js 14 (App Router), TypeScript, React, UI components, and toast notifications.
+- `client/` — Next.js 16 (App Router), TypeScript, React, UI components, and toast notifications.
 - `server/` — Express.js, TypeScript, Prisma ORM, JWT authentication, REST API.
 
 **Key Objectives:**
