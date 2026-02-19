@@ -13,6 +13,7 @@ export const requireAuth = async (
 ) => {
   try {
     const token = req.cookies.jwt;
+    console.log('Received JWT token:', token);
 
     if (!token) {
       // clear any stale/invalid jwt cookie (match cookie options used when setting it)
