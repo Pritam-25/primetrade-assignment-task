@@ -9,6 +9,10 @@ import cookieParser from 'cookie-parser';
 import { taskRoutes } from '@routes/index.js';
 
 const app: Express = express();
+
+// Trust first proxy (needed when running behind Render or other proxies)
+app.set('trust proxy', 1);
+
 app.use(cookieParser());
 app.use(express.json());
 

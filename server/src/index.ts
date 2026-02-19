@@ -31,5 +31,6 @@ app.get('/api/v1/health', async (_req, res) => {
 });
 
 app.listen(PORT, () => {
+  console.log('Starting server with environment:', env.FRONTEND_URL);
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });

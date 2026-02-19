@@ -7,6 +7,7 @@ import { API } from "./lib/api";
 export async function proxy(request: NextRequest) {
   // Get all cookies from the incoming request
   const cookieHeader = request.headers.get("cookie") || "";
+  console.log("Proxying request with cookies:", cookieHeader);
 
   // Forward the cookies to the backend's profile/auth endpoint
   try {
