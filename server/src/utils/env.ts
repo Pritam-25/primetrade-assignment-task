@@ -12,6 +12,7 @@ export const env = createEnv({
     JWT_SECRET: z.string(),
     // In development we serve over HTTP; default to 'false' so cookies are set locally
     USE_HTTPS: z.string().default('false'),
+    COOKIE_DOMAIN: z.string().default('http://localhost:3000'),
   },
 
   runtimeEnv: process.env,
