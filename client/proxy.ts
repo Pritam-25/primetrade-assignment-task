@@ -8,6 +8,10 @@ export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
+  // Determine whether this request expects an HTML document (browser navigation)
+  const accept = request.headers.get("accept") || "";
+  const expectsHtml = accept.includes("text/html");
+
   // Pages only for guests (not logged in)
   const authPages = ["/login", "/signup"];
 
@@ -35,23 +39,34 @@ export async function proxy(request: NextRequest) {
     isLoggedIn = false;
   }
 
-  // Redirect logged-in users away from login/signup pages
+  // Redirect logged-in users away from login/signup pages (only for navigations)
   if (authPages.includes(pathname) && isLoggedIn) {
-    console.log("User is authenticated, redirecting to tasks from proxy");
-    url.pathname = "/tasks";
-    return NextResponse.redirect(url);
+    if (expectsHtml) {
+      console.log("User is authenticated, redirecting to tasks from proxy");
+      url.pathname = "/tasks";
+      return NextResponse.redirect(url);
+    }
+    // For non-navigation requests (RSC/fetch), allow the request to continue
+    return NextResponse.next();
   }
 
   // Redirect unauthenticated users from protected pages
   if (protectedRoutes.includes(pathname) && !isLoggedIn) {
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    if (expectsHtml) {
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+    // For data/RSC fetches, return 401 so client fetch can handle redirect
+    return new Response(null, { status: 401 });
   }
 
-  // Redirect logged-in users from landing page to tasks
+  // Redirect logged-in users from landing page to tasks (only for navigations)
   if (pathname === "/" && isLoggedIn) {
-    url.pathname = "/tasks";
-    return NextResponse.redirect(url);
+    if (expectsHtml) {
+      url.pathname = "/tasks";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
   // Otherwise, allow access
