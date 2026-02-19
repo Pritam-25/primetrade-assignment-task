@@ -54,7 +54,7 @@ export function SignUpForm({
         return;
       }
 
-      console.log("redirecting to tasks page... after successful signup");
+      console.log("signup: successful, redirecting to tasks page...");
       toast.success(res.message || "Successfully signed up!");
       router.replace("/tasks");
     });

@@ -11,6 +11,7 @@ export async function proxy(request: NextRequest) {
 
   const token = request.cookies.get("jwt")?.value;
   const isLoggedIn = !!token;
+  console.log(`proxy: Incoming request to ${pathname}, logged in: ${isLoggedIn}`);
 
   // Pages only for guests (not logged in)
   const authPages = ["/login", "/signup"];
@@ -20,6 +21,7 @@ export async function proxy(request: NextRequest) {
 
   // Redirect logged in users away from auth pages
   if (authPages.includes(pathname) && isLoggedIn) {
+    console.log("proxy: Redirecting logged in user away from auth page...");
     url.pathname = "/tasks";
     return NextResponse.redirect(url);
   }
@@ -29,12 +31,14 @@ export async function proxy(request: NextRequest) {
     protectedRoutes.some((route) => pathname.startsWith(route)) &&
     !isLoggedIn
   ) {
+    console.log("proxy: Redirecting logged out user to login page...");
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
   // redirect logged in user form landing page to tasks page
   if (pathname === "/" && isLoggedIn) {
+    console.log("proxy: Redirecting logged in user from landing page to tasks...");
     url.pathname = "/tasks";
     return NextResponse.redirect(url);
   }
