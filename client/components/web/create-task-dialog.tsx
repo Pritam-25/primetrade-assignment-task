@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Controller } from "react-hook-form";
 import { Task } from "@/app/(dashboard)/tasks/_components/taskTable";
+import { getBaseUrl } from "@/utils/getBaseURL";
 
 type CreateTaskDialogProps = {
   // pass `undefined` to render the default Add button, pass a React node to use a custom trigger,
@@ -109,7 +110,8 @@ export function CreateTaskDialog({
         setOpen(false);
         // refresh to revalidate Next data and also revalidate SWR cache
         router.refresh();
-        mutate(process.env.NEXT_PUBLIC_API_URL + API.getTasks);
+        router.push("/tasks");
+        mutate(getBaseUrl() + API.getTasks);
         return;
       }
 
@@ -131,7 +133,7 @@ export function CreateTaskDialog({
         setOpen(false);
         // refresh to revalidate Next data and also revalidate SWR cache
         router.refresh();
-        mutate(process.env.NEXT_PUBLIC_API_URL + API.getTasks);
+        mutate(getBaseUrl() + API.getTasks);
         return;
       }
     });
