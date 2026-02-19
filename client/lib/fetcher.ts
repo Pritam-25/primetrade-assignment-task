@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { env } from "@/utils/env";
 import { API } from "./api";
 import { ApiResponse } from "@/utils/apiResponse";
 
@@ -16,7 +15,7 @@ export interface MutationOptions<TData = unknown, TParams = unknown> {
 }
 
 const baseURL =
-  env.NODE_ENV === "production"
+  process.env.NODE_ENV === "production"
     ? "/api"
     : process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 // Centralized axios instance (optional)

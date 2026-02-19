@@ -1,9 +1,7 @@
 // proxy.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { env } from "@/utils/env";
-import { API } from "./lib/api";
-import { ur } from "zod/locales";
+
 
 export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();

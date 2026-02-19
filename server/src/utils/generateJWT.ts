@@ -3,10 +3,10 @@ import { env } from './env.js';
 
 export const setAuthCookie = (res: Response, token: string) => {
   try {
-    const isProduction = env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === 'production';
 
     console.log('=== Setting Auth Cookie ===');
-    console.log('NODE_ENV:', env.NODE_ENV);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
     console.log('isProduction:', isProduction);
     console.log('Token length:', token?.length);
     console.log('Token preview:', token?.substring(0, 20));

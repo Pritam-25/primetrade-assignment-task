@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import TaskTable, { type Task } from "./_components/taskTable";
 import { fetcher } from "@/lib/fetcher";
 import { API } from "@/lib/api";
-import { env } from "@/utils/env";
 import useSWR from "swr";
 import {
   Card,

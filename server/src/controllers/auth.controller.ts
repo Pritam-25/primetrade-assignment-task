@@ -31,7 +31,7 @@ export const login = async (req: Request, res: Response) => {
 
 // -------------- logout Controller ----------------
 export const logout = (_req: Request, res: Response) => {
-  const isHttps = process.env.NODE_ENV === 'production';
+  const isHttps = process.process.env.NODE_ENV === 'production';
 
   res.clearCookie('jwt', {
     httpOnly: true,

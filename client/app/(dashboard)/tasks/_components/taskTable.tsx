@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -156,7 +155,7 @@ export default function TaskTable({ tasks }: TaskTableProps) {
         } else {
           toast.error(res.errMsg || "Failed to delete task(s)");
         }
-      } catch (err) {
+      } catch {
         toast.error("Failed to delete task(s)");
       } finally {
         setConfirmOpen(false);

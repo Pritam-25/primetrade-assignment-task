@@ -10,7 +10,6 @@ import UpdateProfileDialog, {
 import ProfileSkeleton from "./_components/ProfileSkeleton";
 import { fetcher, request } from "@/lib/fetcher";
 import { API } from "@/lib/api";
-import { env } from "@/utils/env";
 
 import {
   Card,
