@@ -6,31 +6,17 @@ import { API } from "./lib/api";
 import { ur } from "zod/locales";
 
 export async function proxy(request: NextRequest) {
-  const cookieHeader = request.headers.get("cookie") || "";
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
+
+  const token = request.cookies.get("jwt")?.value;
+  const isLoggedIn = !!token;
 
   // Pages only for guests (not logged in)
   const authPages = ["/login", "/signup"];
 
   // Protected pages that require login
   const protectedRoutes = ["/tasks", "/profile"];
-
-  let isLoggedIn = false;
-  try {
-    const profileEndpoint = `${env.NEXT_PUBLIC_API_URL}${API.user}`;
-
-    const profileRes = await fetch(profileEndpoint, {
-      method: "GET",
-      headers: {
-        cookie: cookieHeader,
-      },
-    });
-
-    isLoggedIn = profileRes.ok;
-  } catch (err) {
-    isLoggedIn = false;
-  }
 
   // Redirect logged in users away from auth pages
   if (authPages.includes(pathname) && isLoggedIn) {
@@ -39,7 +25,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // Redirect logged out users to login page for protected routes
-  if (protectedRoutes.includes(pathname) && !isLoggedIn) {
+  if (
+    protectedRoutes.some((route) => pathname.startsWith(route)) &&
+    !isLoggedIn
+  ) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
