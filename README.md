@@ -17,7 +17,7 @@ This repository contains a full-stack task management application developed as p
 
 **Frontend:**
 
-- Next.js 14 (App Router)
+- Next.js 16 (App Router)
 - React + TypeScript
 - TailwindCSS
 - shadcn/ui
