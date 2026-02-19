@@ -74,7 +74,7 @@ export function SignUpForm({
                   <div className="flex flex-col items-center text-center">
                     <h1 className="text-2xl font-bold">Create your account</h1>
                     <p className="text-muted-foreground text-balance">
-                      Sign up to start using ChatApp
+                      Sign up to start using Primetrade
                     </p>
                   </div>
 
