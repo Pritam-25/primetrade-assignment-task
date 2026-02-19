@@ -10,6 +10,7 @@ export async function proxy(request: NextRequest) {
   const pathname = url.pathname;
 
   const token = request.cookies.get("jwt")?.value;
+  console.log(`proxy: token present: ${token}`);
   const isLoggedIn = !!token;
   console.log(`proxy: Incoming request to ${pathname}, logged in: ${isLoggedIn}`);
 
