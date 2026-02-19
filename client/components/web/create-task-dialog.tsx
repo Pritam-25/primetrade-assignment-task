@@ -88,7 +88,7 @@ export function CreateTaskDialog({
     } else if (mode === "create") {
       form.reset({ title: "", description: "" });
     }
-  }, [initialValues]);
+  }, [initialValues, form, mode]);
 
   const onSubmit = (values: CreateTaskInput | UpdateTaskInput) => {
     startTransition(async () => {
